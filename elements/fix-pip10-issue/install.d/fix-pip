@@ -1,0 +1,38 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+if [[ $DISTRO_NAME =~ (ubuntu) ]]; then
+
+    apt-get -y autoremove python-six python3-six python-chardet python-yaml python-json-pointer
+    curl -LOJf https://bootstrap.pypa.io/get-pip.py
+    python get-pip.py
+    pip list
+    pip2 install --upgrade setuptools virtualenv
+    pip2 install github3.py
+    python3 get-pip.py
+    pip list
+    pip3 install --upgrade setuptools virtualenv
+    pip install six==1.11.0
+    pip list
+
+else
+    #yum -y uninstall python-six python3-six python-chardet python-yaml python-json-pointer
+    #packages="python-six python3-six python-chardet python-yaml python-json-pointer"
+    #for pkg in $packages; do
+    #    rpm -ql $pkg | xargs rm -rf
+    #done
+    rpm -e --nodeps python-requests
+    curl -LOJf https://bootstrap.pypa.io/get-pip.py
+    python get-pip.py
+    pip list
+    pip2 install --upgrade setuptools virtualenv
+    pip2 install github3.py
+    pip install six==1.11.0
+    pip list
+
+fi
