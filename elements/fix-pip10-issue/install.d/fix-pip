@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ ${DIB_DEBUG_TRACE:-0} -gt 0 ]; then
+    set -x
+fi
+set -eu
+set -o pipefail
+
+if [[ $DISTRO_NAME =~ (ubuntu) ]]; then
+
+    apt-get install -y python-pip python3-pip python-virtualenv
+    pip install requests==2.18.4 six==1.11.0 chardet==3.0.4 ipaddress==1.0.22 pyinotify==0.9.6 PyYAML==3.12 jsonpointer==2.0 --ignore-installed
+
+elif [[ $DISTRO_NAME =~ (centos7|rhel7) ]]; then
+
+    packages="python-virtualenv python2-pip"
+    if [[ "$(rpm -q --qf '[%{obsoletes}\n]' python2-setuptools)" == "python-setuptools" ]]; then
+        # If OpenStack release is installed, then python-setuptools is
+        # obsoleted by python2-setuptools
+        packages+=" python2-setuptools"
+    else
+        packages+=" python-setuptools"
+    fi
+    yum --enablerepo=epel install -y $packages
+    pip install requests==2.18.4 six==1.11.0 chardet==3.0.4 ipaddress==1.0.22 pyinotify==0.9.6 PyYAML==3.12 --ignore-installed
+
+fi
